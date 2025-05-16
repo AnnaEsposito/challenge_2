@@ -1,143 +1,73 @@
-#include <iostream>
-#include <vector>
-#include <algorithm> // Para std::shuffle
-#include <random>    // Para std::random_device, std::mt19937
-#include <queue>     // Para usar colas, que son esenciales en la implementación de BFS 
-#include <tuple>     // Para std::pair y std::tuple
-#include <cstdlib>   // Para std::shuffle
+import random
+from collections import deque
 
-using namespace std;
+# Función para imprimir el laberinto
+def imprimir_laberinto(matriz):
+    for fila in matriz:
+        print(" ".join(fila))
+    print()
 
-// Declaro las funciones a utilizar
-void laberinto(int alto, int ancho);
-void crearCamino(int x, int y, vector<vector<char>>& matriz, int alto, int ancho, pair<int, int> salida);
-void imprimirLaberinto(const vector<vector<char>>& matriz);
-bool esValido(int x, int y, int alto, int ancho);
+# Función para crear el laberinto
+def crear_laberinto(alto, ancho):
+    matriz = [["#" for _ in range(ancho)] for _ in range(alto)]
+    inicio = (1, 1)
+    salida = (alto - 2, ancho - 2)
+    matriz[inicio[0]][inicio[1]] = "E"
 
-// Función para resolver el laberinto utilizando BFS y marcar el camino correcto
-bool resolverLaberinto(int alto, int ancho, pair<int, int> inicio, pair<int, int> fin, vector<vector<char>>& matriz) {
-    vector<vector<bool>> visitado(alto, vector<bool>(ancho, false)); // vector de nodos ya visitados
-    vector<vector<pair<int, int>>> previo(alto, vector<pair<int, int>>(ancho, {-1, -1})); // matriz de coordenadas previas
+    direcciones = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+    crear_camino(inicio[0], inicio[1], matriz, alto, ancho, salida, direcciones)
+    matriz[salida[0]][salida[1]] = "S"
+    return matriz, inicio, salida
 
-    queue<pair<int, int>> cola; 
-    cola.push(inicio);
-    visitado[inicio.first][inicio.second] = true;
+# Función recursiva para crear caminos
+def crear_camino(x, y, matriz, alto, ancho, salida, direcciones):
+    random.shuffle(direcciones)
+    for dx, dy in direcciones:
+        nx, ny = x + dx * 2, y + dy * 2
+        if 0 < nx < alto - 1 and 0 < ny < ancho - 1 and matriz[nx][ny] == "#":
+            matriz[x + dx][y + dy] = " "  # Limpia el espacio intermedio
+            matriz[nx][ny] = " "  # Limpia el nuevo espacio
+            crear_camino(nx, ny, matriz, alto, ancho, salida, direcciones)
 
-    vector<pair<int, int>> direcciones = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+# Función para resolver el laberinto usando BFS
+def resolver_laberinto(matriz, inicio, salida):
+    alto, ancho = len(matriz), len(matriz[0])
+    visitado = [[False for _ in range(ancho)] for _ in range(alto)]
+    previo = [[None for _ in range(ancho)] for _ in range(alto)]
+    cola = deque([inicio])
+    visitado[inicio[0]][inicio[1]] = True
 
-    while (!cola.empty()) {
-        int x, y;
-        tie(x, y) = cola.front();
-        cola.pop();
+    while cola:
+        x, y = cola.popleft()
 
-        if (x == fin.first && y == fin.second) {
-            // Reconstruir el camino desde el final hasta el inicio
-            pair<int, int> actual = fin;
-            while (actual != inicio) {
-                matriz[actual.first][actual.second] = 'C'; // Marcar el camino correcto 
-                actual = previo[actual.first][actual.second];
-            }
-            matriz[inicio.first][inicio.second] = 'E'; // Asegurar que el inicio se mantenga marcado
-            matriz[fin.first][fin.second] = 'S'; // Asegurar que la salida se mantenga marcada
-            return true; // Encontró el camino
-        }
+        if (x, y) == salida:
+            # Reconstruir el camino
+            while (x, y) != inicio:
+                matriz[x][y] = "C"
+                x, y = previo[x][y]
+            matriz[inicio[0]][inicio[1]] = "E"
+            matriz[salida[0]][salida[1]] = "S"
+            return True
 
-        for (const pair<int, int>& dir : direcciones) {
-            int nx = x + dir.first, ny = y + dir.second;
-            if (esValido(nx, ny, alto, ancho) && matriz[nx][ny] != '#' && !visitado[nx][ny]) {
-                cola.push({nx, ny});
-                visitado[nx][ny] = true;
-                previo[nx][ny] = {x, y}; // Guardar la coordenada previa
-            }
-        }
-    }
+        for dx, dy in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
+            nx, ny = x + dx, y + dy
+            if 0 <= nx < alto and 0 <= ny < ancho and not visitado[nx][ny] and matriz[nx][ny] != "#":
+                visitado[nx][ny] = True
+                previo[nx][ny] = (x, y)
+                cola.append((nx, ny))
 
-    return false; // No encontró el camino
-}
+    return False
 
+# Función principal para ejecutar el laberinto
+if __name__ == "__main__":
+    ancho = int(input("Ingrese el ancho del laberinto: "))
+    alto = int(input("Ingrese el alto del laberinto: "))
+    matriz, inicio, salida = crear_laberinto(alto, ancho)
+    imprimir_laberinto(matriz)
 
-// Función para crear el laberinto
-void laberinto(int alto, int ancho) {
-    vector<vector<char>> matriz(alto, vector<char>(ancho, '#'));
-
-    pair<int, int> inicio = {1, 1};
-    pair<int, int> fin = {alto - 2, ancho - 2};
-    matriz[inicio.first][inicio.second] = 'E';
-
-    // Llamar a crearCamino con la posición de inicio, tamaño del laberinto y posición de salida
-    crearCamino(inicio.first, inicio.second, matriz, alto, ancho, fin);
-
-    // Eliminar las paredes adyacentes a la salida
-    matriz[fin.first][fin.second] = ' '; // Limpiar la celda de salida
-    if (fin.first > 0) matriz[fin.first - 1][fin.second] = ' '; // Arriba de la salida
-    if (fin.first < alto - 1) matriz[fin.first + 1][fin.second] = ' '; // Abajo de la salida
-    if (fin.second > 0) matriz[fin.first][fin.second - 1] = ' '; // Izquierda de la salida
-    if (fin.second < ancho - 1) matriz[fin.first][fin.second + 1] = ' '; // Derecha de la salida
-
-    // Intentar resolver el laberinto
-    if (resolverLaberinto(alto, ancho, inicio, fin, matriz)) {
-        cout << "\nSe encontró una solución para el laberinto.\n";
-    } else {
-        cout << "\nNo se encontró una solución para el laberinto.\n";
-    }
-
-    // Imprimir el laberinto después de resolverlo
-    cout << "\nLaberinto después de resolver:\n";
-    imprimirLaberinto(matriz);
-}
-
-// Inicializar la función crear camino
-// crearCamino recibe la matriz por referencia para modificarla directamente.
-void crearCamino(int x, int y, vector<vector<char>>& matriz, int alto, int ancho, pair<int, int> salida) {
-    static const vector<pair<int, int>> direcciones = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
-    matriz[x][y] = ' ';
-
-    // Generador de números aleatorios
-    random_device rd;
-    mt19937 g(rd());
-
-    // Desordenar aleatoriamente las direcciones
-    vector<pair<int, int>> shuffledDirecciones = direcciones;
-    shuffle(shuffledDirecciones.begin(), shuffledDirecciones.end(), g);
-
-    for (const pair<int, int>& dir : shuffledDirecciones) {
-        int nx = x + dir.first * 2, ny = y + dir.second * 2;
-        // Verificar si la nueva posición está dentro de los límites y es un muro
-        if (esValido(nx, ny, alto, ancho) && matriz[nx][ny] == '#') {
-            matriz[nx - dir.first][ny - dir.second] = ' '; // Abrir el camino intermedio
-            crearCamino(nx, ny, matriz, alto, ancho, salida); // Llamada recursiva
-
-            
-        }
-    }
-}
-
-bool esValido(int x, int y, int alto, int ancho) {
-    return x > 0 && x < alto - 1 && y > 0 && y < ancho - 1;
-}
-
-// Función para imprimir el laberinto
-void imprimirLaberinto(const vector<vector<char>>& matriz) {
-    for (const auto& fila : matriz) {
-        for (char celda : fila) {
-            cout << celda << ' ';
-        }
-        cout << endl;
-    }
-}
-
-
-int main() {
-    int ancho, alto;
-    cout << "Ingrese el ancho del laberinto: ";
-    cin >> ancho;
-
-    cout << "Ingrese el alto del laberinto: ";
-    cin >> alto;
-
-    // Llamar a la función laberinto 
-    laberinto(alto, ancho);
-
-    return 0;
-}
+    if resolver_laberinto(matriz, inicio, salida):
+        print("\nSe encontró una solución para el laberinto:\n")
+    else:
+        print("\nNo se encontró una solución para el laberinto.\n")
+    imprimir_laberinto(matriz)
 
