@@ -1,49 +1,25 @@
-# Maze Generator and Solver - Python Version
+# Maze Generator and Solver in C++
 
-A maze generation and solving project in Python. This version uses **Breadth-First Search (BFS)** for pathfinding and **randomized Prim's algorithm** for maze generation, resulting in complex and fully connected mazes.
+This project is a maze generator and solver implemented in C++. It creates random mazes using depth-first search (DFS) for maze generation and breadth-first search (BFS) for pathfinding. The maze is represented as a 2D grid with walls, paths, an entry point, and an exit.
 
 ## Features
-- **Maze Generation:** Uses a randomized version of Prim's algorithm to create unpredictable, fully connected mazes.
-- **Pathfinding Algorithm:** Implements **Breadth-First Search (BFS)** to find the optimal path from the entrance to the exit.
-- **Dynamic Path Marking:** Marks the correct path with a clear visual indicator (`C`) for easy interpretation.
-- **Customizable Maze Size:** Allows users to specify maze dimensions for flexible testing.
-- **Boundary and Connectivity Logic:** Efficiently manages boundaries to prevent out-of-bounds errors and ensure valid path connections.
-- **Randomized Direction Shuffling:** Adds an element of unpredictability to the maze structure.
-- **Interactive Input:** Prompts the user for maze dimensions, enhancing the interactive experience.
-- **Recursive Path Creation:** Uses recursion to carve paths through the maze for a more organic structure.
+- **Maze Generation:** Uses a depth-first search algorithm to generate complex, interconnected mazes.
+- **Pathfinding:** Solves the maze using breadth-first search, ensuring the shortest path is found.
+- **Customizable Maze Size:** Allows the user to define the maze dimensions.
+- **Random Path Generation:** Generates unpredictable, unique maze layouts every time.
+- **Clear Path Display:** Marks the correct path from the entry to the exit once solved.
+- **Boundary Handling:** Ensures proper wall creation and maze boundaries.
 
 ## Technologies Used
-- **Python:** Core programming language.
-- **Algorithms:** BFS for pathfinding, randomized Prim's for maze generation.
-- **Data Structures:** 2D lists for maze representation, queues for BFS.
+- **C++:** Core programming language.
+- **Algorithms:** Depth-first search (DFS) for maze creation, breadth-first search (BFS) for pathfinding.
+- **Randomization:** Uses the Mersenne Twister engine for high-quality random numbers.
+- **Data Structures:** Vectors and queues for efficient pathfinding and maze generation.
 
 ## How to Run
-1. Make sure you have **Python 3.8+** installed.
+1. Make sure you have a C++ compiler installed (e.g., g++ or MSVC).
 2. Clone the repository to your local machine.
-3. Run the script using the command:
+3. Compile the program:
    ```bash
-   python maze_generator_solver.py
-
-## Sample Output
--Ingrese el ancho del laberinto: 15
--Ingrese el alto del laberinto: 15
-
-Se encontró una solución para el laberinto.
-
-Laberinto después de resolver:
-# # # # # # # # # # # # # # #
-# E   #       #       #     #
-# # # # # # # # # #   # #   #
-#       #   #     #   #   # #
-# # #   #   # # # #   # # # #
-#   #   #   #     #         #
-#   #   # # # # # # # # # # #
-#   #   #   #       #   #   #
-#   #   #   # # #   #   # # #
-#   #   #   #   #   #       #
-#   #   # # #   # # # # #   #
-#   #       #   #         # #
-#   # # # # # # # # # # #   #
-#     #           #         #
-# # # # # # # # # # # # # # S
+   g++ -o laberinto.cpp
 
