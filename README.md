@@ -1,6 +1,6 @@
 # Maze Generator and Solver - Python Version
 
-A maze generation and solving project in Python, inspired by the original C++ implementation. This version uses **Breadth-First Search (BFS)** for pathfinding and **randomized Prim's algorithm** for maze generation, resulting in complex and fully connected mazes.
+A maze generation and solving project in Python. This version uses **Breadth-First Search (BFS)** for pathfinding and **randomized Prim's algorithm** for maze generation, resulting in complex and fully connected mazes.
 
 ## Features
 - **Maze Generation:** Uses a randomized version of Prim's algorithm to create unpredictable, fully connected mazes.
